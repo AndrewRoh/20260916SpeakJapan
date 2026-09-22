@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*service-account*.json
+*credentials*.json
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# PWA generated
+client/dev-dist/
+client/.vite/
