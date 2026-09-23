@@ -6,6 +6,7 @@ import { apiRateLimiter } from './middleware/rateLimit.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { ttsRouter } from './routes/tts.js';
 import { createLessonsRouter } from './routes/lessons.js';
+import { serveClientIfBuilt } from './staticClient.js';
 
 export function createApp(env: Env): Express {
   const app = express();
@@ -17,6 +18,8 @@ export function createApp(env: Env): Express {
 
   app.use('/api', ttsRouter);
   app.use('/api', createLessonsRouter(env));
+
+  serveClientIfBuilt(app);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

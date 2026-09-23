@@ -98,7 +98,45 @@ npm run build        # 클라이언트 프로덕션 빌드
 3. 靑空文庫 형식의 루비(`｜漢字《かんじ》`)와 주석(`［＃...］`)이 있으면 자동으로 파싱되어
    후리가나로 표시되고, 없으면 그대로 평문으로 표시됩니다.
 
-## 6. 비용 관련 주의사항
+## 6. Docker Compose로 배포하기 (예: Synology NAS)
+
+프로덕션에서는 서버가 클라이언트 빌드 결과물(`client/dist`)도 같이 서빙합니다. 즉,
+**컨테이너 하나 + 포트 하나**로 전체 앱이 뜹니다.
+
+1. NAS(또는 배포할 서버)에 저장소를 준비합니다. 예: Synology의 `/volume1/docker/SpeakNihongo`
+   ```bash
+   cd /volume1/docker
+   git clone https://github.com/AndrewRoh/20260916SpeakJapan.git SpeakNihongo
+   cd SpeakNihongo
+   ```
+2. `server/.env`와 `server/gcp-service-account.json`을 로컬에서 하던 것과 동일하게
+   준비합니다(1~2단계 참고). 이 두 파일은 이미지에 포함되지 않고 컨테이너 실행 시
+   `docker-compose.yml`이 그대로 읽어들입니다.
+3. 빌드 후 백그라운드로 실행합니다.
+   ```bash
+   docker compose up -d --build
+   ```
+4. `http://<NAS-IP>:8787`로 접속하면 바로 앱이 뜹니다(같은 포트에서 화면과 API를 모두
+   서빙하므로 `/api` 프록시 설정이 따로 필요 없습니다).
+
+기본적으로 호스트 포트도 8787입니다. 다른 포트로 열고 싶다면 `docker-compose.yml`의
+`ports` 항목만 바꾸면 됩니다(예: `"30020:8787"`). Synology의 리버스 프록시(제어판 →
+로그인 포털 → 고급 → 리버스 프록시)에 이 컨테이너 포트를 연결해서 도메인/HTTPS를
+붙일 수도 있습니다.
+
+업데이트할 때는:
+```bash
+git pull
+docker compose up -d --build
+```
+
+로그 확인 / 중지:
+```bash
+docker compose logs -f
+docker compose down
+```
+
+## 7. 비용 관련 주의사항
 
 - Google Cloud TTS와 Gemini API는 모두 **사용량 기반 과금**입니다.
 - 이 앱은 문장 단위로 오디오를 요청하고, `SHA-256(음성|속도|텍스트)` 키로 IndexedDB에
@@ -109,7 +147,7 @@ npm run build        # 클라이언트 프로덕션 빌드
 - 레슨 생성(Gemini)과 신규 문장의 첫 TTS 요청만 과금 대상이며, 캐시된 재생과 반복
   재생/구간 반복은 추가 비용이 들지 않습니다.
 
-## 7. 구현 범위 안내
+## 8. 구현 범위 안내
 
 이번 구현은 필수 요구사항(A~F)에 집중했습니다. 아래 선택적 기능은 이번 범위에서 제외했습니다.
 

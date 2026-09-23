@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: speak-nihongo
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    env_file:
+      - server/.env
+    volumes:
+      - ./server/gcp-service-account.json:/app/server/gcp-service-account.json:ro

@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/coverage
+**/.vite
+**/dev-dist
+.git
+.github
+
+# 비밀값/키는 이미지에 절대 포함하지 않는다 — docker-compose의 env_file/volumes로 주입한다.
+.env
+.env.*
+**/gcp-service-account.json
+**/*credentials*.json
+
+*.log
+README.md
