@@ -1,4 +1,5 @@
 import { db, type AudioCacheEntry } from '../db/schema';
+import { sha256Hex } from '../utils/sha256';
 
 /** 오디오 캐시가 차지할 수 있는 최대 용량(약 300MB) */
 export const MAX_CACHE_BYTES = 300 * 1024 * 1024;
@@ -11,12 +12,7 @@ export interface CacheKeyParams {
 
 /** 키는 SHA-256(voiceName|speakingRate|text)의 16진 문자열이다. */
 export async function computeCacheKey({ voiceName, speakingRate, text }: CacheKeyParams): Promise<string> {
-  const raw = `${voiceName}|${speakingRate}|${text}`;
-  const data = new TextEncoder().encode(raw);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('');
+  return sha256Hex(`${voiceName}|${speakingRate}|${text}`);
 }
 
 export async function getCachedAudio(params: CacheKeyParams): Promise<Blob | undefined> {
