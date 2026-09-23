@@ -20,8 +20,8 @@
 2. **Cloud Text-to-Speech API**를 활성화합니다.
 3. IAM → 서비스 계정에서 새 서비스 계정을 만들고(`Cloud Text-to-Speech API 사용자` 권한이면
    충분합니다), JSON 키 파일을 다운로드합니다.
-4. 다운로드한 JSON 키 파일을 저장소 바깥이나 `.gitignore`에 이미 포함된 이름(예:
-   `gcp-service-account.json`)으로 저장합니다. **이 파일을 절대 커밋하지 마세요.**
+4. 다운로드한 JSON 키 파일을 `server/gcp-service-account.json`으로 저장합니다.
+   `.gitignore`에 이미 포함되어 있어 커밋되지 않습니다. **이 파일을 절대 커밋하지 마세요.**
 
 ### 1-2. Gemini API 키
 
@@ -29,10 +29,12 @@
 
 ## 2. 환경변수 설정
 
-`.env.example`을 복사해서 `.env`를 만들고 값을 채웁니다.
+`.env`와 서비스 계정 JSON 키는 모두 **`server/` 폴더 안**에 둡니다(서버 프로세스가
+그 위치를 기준으로 찾습니다). `server/.env.example`을 복사해서 `server/.env`를 만들고
+값을 채웁니다.
 
 ```bash
-cp .env.example .env
+cp server/.env.example server/.env
 ```
 
 ```env
