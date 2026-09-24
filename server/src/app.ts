@@ -15,10 +15,17 @@ export function createApp(env: Env): Express {
     helmet({
       // upgrade-insecure-requests가 켜져 있으면 HTTP로만 서빙하는 배포(예: NAS 내부망)에서
       // 브라우저가 정적 자산을 https://로 요청하다 연결 실패로 화면이 비게 된다.
+      // media-src 기본값은 blob: URL을 허용하지 않아, TTS 오디오(Blob → blob: URL)를
+      // <audio>에 넣으면 CSP 위반으로 재생이 막힌다.
       contentSecurityPolicy: {
         useDefaults: true,
-        directives: { upgradeInsecureRequests: null },
+        directives: {
+          upgradeInsecureRequests: null,
+          mediaSrc: ["'self'", 'blob:'],
+        },
       },
+      // COOP는 HTTPS에서만 의미가 있고, HTTP 배포에서는 무시되며 콘솔 경고만 남긴다.
+      crossOriginOpenerPolicy: false,
     }),
   );
   app.use(cors());
