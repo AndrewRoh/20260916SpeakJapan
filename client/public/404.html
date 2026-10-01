@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>일본어 듣기 & 책 읽기</title>
+    <script type="text/javascript">
+      // GitHub Pages는 정적 파일만 서빙해서 /listening/abc 같은 깊은 경로를 새로고침하면
+      // 404가 뜬다. 실제 경로를 쿼리스트링에 인코딩해 index.html로 돌려보내고,
+      // index.html에서 다시 원래 경로로 복원한다. (https://github.com/rafgraph/spa-github-pages)
+      var pathSegmentsToKeep = 1; // /20260916SpeakJapan/ 까지는 그대로 둔다
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

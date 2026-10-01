@@ -181,7 +181,34 @@ docker compose down
   추적하지 않으므로 "로그아웃 상태에서 삭제 → 다시 로그인" 시 클라우드에 남아있던
   이전 데이터가 복원될 수 있습니다.
 
-## 9. 구현 범위 안내
+## 9. GitHub Pages로 화면 배포하기
+
+`.github/workflows/deploy-pages.yml`이 `main`에 푸시될 때마다 `client`를 빌드해서
+`https://<계정>.github.io/20260916SpeakJapan/`에 자동 배포합니다.
+
+**저장소 설정에서 한 번만 해주셔야 할 것**: GitHub 저장소 → Settings → Pages →
+**Source**를 "Deploy from a branch"가 아니라 **"GitHub Actions"**로 바꿔주세요.
+이걸 안 바꾸면 저장소 루트(README 등)가 그대로 노출되고 실제 앱은 안 뜹니다.
+
+### ⚠️ 중요한 제약 — API 서버는 GitHub Pages에 올라가지 않습니다
+
+GitHub Pages(Netlify도 동일)는 **정적 파일만 서빙**합니다. `GEMINI_API_KEY`와 GCP
+서비스 계정 키를 들고 있는 `server`(Express, TTS/Gemini 프록시)는 별도로 어딘가에서
+실행되어야 합니다. 지금 배포는 **화면(client)만** 올라가므로, API 서버 주소를 정하기
+전까지는 레슨 생성·TTS 재생이 동작하지 않습니다(화면 자체, 내장 책 읽기 등 로컬
+기능은 정상 동작).
+
+API 서버를 둘 수 있는 곳(택1):
+1. 이미 만들어둔 `Dockerfile`로 Render/Fly.io/Cloud Run 등 Node 실행 가능한 곳에 배포
+2. Synology NAS에 그대로 Docker Compose로 띄우고, 외부에서 접속 가능하게 포트포워딩/
+   리버스 프록시(HTTPS 권장) 설정
+3. Netlify Functions처럼 서버리스 함수로 변환해서 올리기
+
+API 서버 주소가 정해지면 `client/src/shared/tts/ttsClient.ts`의 `/api/...` 상대경로를
+그 주소의 절대 URL로 바꾸고, 서버 쪽 CORS에 `https://<계정>.github.io` 오리진을
+허용해야 합니다.
+
+## 10. 구현 범위 안내
 
 이번 구현은 필수 요구사항(A~F)에 집중했습니다. 아래 선택적 기능은 이번 범위에서 제외했습니다.
 

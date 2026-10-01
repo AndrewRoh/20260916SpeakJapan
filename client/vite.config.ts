@@ -4,7 +4,12 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+// GitHub Pages는 https://<user>.github.io/<repo>/ 서브패스로 서빙되므로,
+// 빌드(production)에서만 그 서브패스를 base로 쓴다. 개발 서버는 그대로 '/'.
+const GITHUB_PAGES_BASE = '/20260916SpeakJapan/';
+
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? GITHUB_PAGES_BASE : '/',
   plugins: [
     react(),
     tailwindcss(),
@@ -16,7 +21,8 @@ export default defineConfig({
         short_name: '日本語リスニング',
         description: '천천히 반복해서 듣는 일본어 회화 학습 + 일본어 책 읽기',
         lang: 'ko',
-        start_url: '/',
+        start_url: GITHUB_PAGES_BASE,
+        scope: GITHUB_PAGES_BASE,
         display: 'standalone',
         background_color: '#ffffff',
         theme_color: '#111827',
@@ -48,4 +54,4 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
   },
-});
+}));
