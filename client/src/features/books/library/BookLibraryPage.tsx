@@ -6,6 +6,7 @@ import { Button } from '../../../shared/ui/Button';
 import { Dialog } from '../../../shared/ui/Dialog';
 import { ensureBundledBooksImported } from './bundledBooks';
 import { BookUploadForm } from '../upload/BookUploadForm';
+import { mirrorBookDelete } from '../../auth/cloudSync';
 
 export function BookLibraryPage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -28,6 +29,7 @@ export function BookLibraryPage() {
   async function confirmDelete() {
     if (!pendingDeleteId) return;
     await deleteBook(pendingDeleteId);
+    void mirrorBookDelete(pendingDeleteId);
     setPendingDeleteId(undefined);
     await reload();
   }

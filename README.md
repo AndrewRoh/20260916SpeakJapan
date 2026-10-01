@@ -146,7 +146,42 @@ docker compose down
 - 레슨 생성(Gemini)과 신규 문장의 첫 TTS 요청만 과금 대상이며, 캐시된 재생과 반복
   재생/구간 반복은 추가 비용이 들지 않습니다.
 
-## 8. 구현 범위 안내
+## 8. 로그인 + 클라우드 동기화 (Firebase)
+
+로그인하지 않아도 지금까지처럼 모든 기능이 기기 로컬(IndexedDB)에서 그대로 동작합니다.
+**Google로 로그인하면** 레슨/내가 올린 책/읽기 진행 위치/설정이 Firestore로 자동 동기화되어
+다른 기기에서도 이어볼 수 있습니다.
+
+### 설정
+
+1. [Firebase 콘솔](https://console.firebase.google.com/)에서 프로젝트 선택 → **Authentication**
+   → **Sign-in method** → **Google** 제공업체 사용 설정
+2. **Firestore Database** 생성(아직 안 했다면) → 저장소 루트의 `firestore.rules`를 배포:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase deploy --only firestore:rules
+   ```
+3. `client/src/shared/firebase/config.ts`의 Firebase 설정값(`apiKey` 등)을 본인 프로젝트
+   값으로 맞춰주세요. 이 값들은 비밀값이 아니라 번들에 그대로 포함되어도 안전합니다(접근
+   제어는 Firestore 규칙과 로그인으로 합니다).
+4. **중요**: Firebase Authentication은 **Authorized domains**(승인된 도메인)에 등록된
+   주소에서만 로그인 팝업이 동작합니다. 기본값은 `localhost`와
+   `<project-id>.firebaseapp.com` 정도만 포함되어 있어서, NAS IP(`192.168.x.x`)나 실제
+   도메인으로 접속한다면 **Authentication → Settings → Authorized domains**에 그 주소를
+   추가해야 합니다. 안 해두면 로그인 시 `auth/unauthorized-domain` 오류가 납니다.
+
+### 동작 방식
+
+- 레슨 생성/삭제, 책 업로드/삭제, 읽기 진행 위치, 설정 변경 — 로그인 중이면 즉시
+  Firestore로도 같이 저장됩니다(실패해도 로컬 동작은 막지 않습니다).
+- 로그인하는 순간 클라우드에 있던 데이터와 로컬 데이터를 합칩니다. 같은 항목이 양쪽에
+  다 있으면 더 최근에 수정된 쪽을 기준으로 맞춥니다.
+- 내장 책(bundled)은 동기화 대상이 아니며, 로그아웃 상태를 포함해 삭제 이력은 별도로
+  추적하지 않으므로 "로그아웃 상태에서 삭제 → 다시 로그인" 시 클라우드에 남아있던
+  이전 데이터가 복원될 수 있습니다.
+
+## 9. 구현 범위 안내
 
 이번 구현은 필수 요구사항(A~F)에 집중했습니다. 아래 선택적 기능은 이번 범위에서 제외했습니다.
 

@@ -4,6 +4,7 @@ import type { Lesson } from '@jp-listening-app/shared';
 import { deleteLesson, listLessons } from '../../shared/db/repositories';
 import { Button } from '../../shared/ui/Button';
 import { Dialog } from '../../shared/ui/Dialog';
+import { mirrorLessonDelete } from '../auth/cloudSync';
 
 export function LessonListPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -20,6 +21,7 @@ export function LessonListPage() {
   async function confirmDelete() {
     if (!pendingDeleteId) return;
     await deleteLesson(pendingDeleteId);
+    void mirrorLessonDelete(pendingDeleteId);
     setPendingDeleteId(undefined);
     await reload();
   }

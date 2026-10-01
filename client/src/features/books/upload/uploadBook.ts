@@ -3,6 +3,7 @@ import { decodeJapaneseText } from '../../../shared/text/textDecoder';
 import { buildBookSentences } from '../../../shared/text/bookIngestion';
 import { listBooks, saveBook } from '../../../shared/db/repositories';
 import { generateId } from '../../../shared/utils/uuid';
+import { mirrorBookSave } from '../../auth/cloudSync';
 import { fileNameToTitle, resolveDuplicateTitle, validateUploadFile } from './validateUpload';
 
 export interface UploadBookResult {
@@ -48,5 +49,6 @@ export async function uploadBook({ file, title }: UploadBookOptions): Promise<Up
   };
 
   await saveBook(book, sentences);
+  void mirrorBookSave(book, sentences);
   return { book };
 }

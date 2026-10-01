@@ -6,6 +6,7 @@ import { fetchSentenceAudio } from '../../../shared/tts/ttsClient';
 import { bindMediaSession } from '../../../shared/audio/mediaSession';
 import { getReadingProgress, saveReadingProgress } from '../../../shared/db/repositories';
 import { useSettingsStore } from '../../settings/settingsStore';
+import { mirrorReadingProgressSave } from '../../auth/cloudSync';
 
 export function useBookPlayer(bookId: string, bookTitle: string, sentences: BookSentence[]) {
   const initialSpeed = useSettingsStore((s) => s.speed);
@@ -55,7 +56,9 @@ export function useBookPlayer(bookId: string, bookTitle: string, sentences: Book
         onStatusChange: (nextStatus, index) => {
           setStatus(nextStatus);
           setCurrentIndex(index);
-          void saveReadingProgress({ bookId, sentenceIndex: index, updatedAt: Date.now() });
+          const progress = { bookId, sentenceIndex: index, updatedAt: Date.now() };
+          void saveReadingProgress(progress);
+          void mirrorReadingProgressSave(progress);
         },
       });
 

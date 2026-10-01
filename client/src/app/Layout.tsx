@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { LoginButton } from '../features/auth/LoginButton';
 
 const NAV_ITEMS = [
   { to: '/listening', label: '듣기 학습' },
@@ -25,6 +26,7 @@ export function Layout() {
               {item.label}
             </NavLink>
           ))}
+          <LoginButton />
         </nav>
       </header>
       <main>

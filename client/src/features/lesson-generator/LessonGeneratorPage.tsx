@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { JlptLevel } from '@jp-listening-app/shared';
 import { Button } from '../../shared/ui/Button';
 import { saveLesson } from '../../shared/db/repositories';
+import { mirrorLessonSave } from '../auth/cloudSync';
 import { useGenerateLesson } from './useGenerateLesson';
 
 const LEVELS: JlptLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
@@ -19,6 +20,7 @@ export function LessonGeneratorPage() {
     const lesson = await generate({ topic: topic.trim(), level, lineCount });
     if (!lesson) return;
     await saveLesson(lesson);
+    void mirrorLessonSave(lesson);
     navigate(`/listening/${lesson.id}`);
   }
 
