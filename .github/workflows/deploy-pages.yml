@@ -30,7 +30,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build client (화면만 배포 — API 서버는 별도 호스팅 필요)
+      - name: Build client (화면만 배포 — API는 Cloud Run 등 별도 호스팅 필요)
+        # Settings → Secrets and variables → Actions → Variables에 API_BASE_URL을
+        # 등록해두면(예: Cloud Run URL) 빌드된 화면이 그 주소로 /api 요청을 보낸다.
+        # 비워두면 상대경로(/api/...)로 빌드되어 API 호출이 실패한다.
+        env:
+          VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
         run: npm run build --workspace=client
 
       - name: Setup Pages

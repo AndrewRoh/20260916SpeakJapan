@@ -1,4 +1,5 @@
 import type { JapaneseVoice } from '@jp-listening-app/shared';
+import { apiUrl } from '../api/apiBaseUrl';
 import { getCachedAudio, putCachedAudio } from './audioCache';
 
 export interface FetchSentenceAudioParams {
@@ -28,7 +29,7 @@ export async function fetchSentenceAudio(params: FetchSentenceAudioParams): Prom
   const cached = await getCachedAudio(params);
   if (cached) return cached;
 
-  const response = await fetch('/api/tts', {
+  const response = await fetch(apiUrl('/api/tts'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -49,7 +50,7 @@ export async function fetchSentenceAudio(params: FetchSentenceAudioParams): Prom
 }
 
 export async function fetchJapaneseVoices(): Promise<JapaneseVoice[]> {
-  const response = await fetch('/api/tts/voices');
+  const response = await fetch(apiUrl('/api/tts/voices'));
   if (!response.ok) {
     throw new Error('음성 목록을 불러오지 못했습니다.');
   }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { lessonSchema, type JlptLevel, type Lesson } from '@jp-listening-app/shared';
+import { apiUrl } from '../../shared/api/apiBaseUrl';
 
 export interface GenerateLessonParams {
   topic: string;
@@ -19,7 +20,7 @@ export function useGenerateLesson() {
     setLoading(true);
     setError(undefined);
     try {
-      const response = await fetch('/api/lessons/generate', {
+      const response = await fetch(apiUrl('/api/lessons/generate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),

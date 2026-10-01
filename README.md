@@ -198,15 +198,37 @@ GitHub Pages(Netlify도 동일)는 **정적 파일만 서빙**합니다. `GEMINI
 전까지는 레슨 생성·TTS 재생이 동작하지 않습니다(화면 자체, 내장 책 읽기 등 로컬
 기능은 정상 동작).
 
-API 서버를 둘 수 있는 곳(택1):
-1. 이미 만들어둔 `Dockerfile`로 Render/Fly.io/Cloud Run 등 Node 실행 가능한 곳에 배포
-2. Synology NAS에 그대로 Docker Compose로 띄우고, 외부에서 접속 가능하게 포트포워딩/
-   리버스 프록시(HTTPS 권장) 설정
-3. Netlify Functions처럼 서버리스 함수로 변환해서 올리기
+API 서버는 이미 만들어둔 `Dockerfile`로 Render/Fly.io/**Google Cloud Run**이나
+Synology NAS(Docker Compose) 등 Node를 실행할 수 있는 곳이면 어디든 올릴 수 있습니다.
+API 서버 주소가 정해지면 아래 2단계만 해주시면 됩니다.
 
-API 서버 주소가 정해지면 `client/src/shared/tts/ttsClient.ts`의 `/api/...` 상대경로를
-그 주소의 절대 URL로 바꾸고, 서버 쪽 CORS에 `https://<계정>.github.io` 오리진을
-허용해야 합니다.
+1. GitHub 저장소 → Settings → Secrets and variables → Actions → **Variables** 탭 →
+   `API_BASE_URL`이라는 이름으로 그 주소(예: `https://jp-listening-app-xxxxx.a.run.app`,
+   끝에 슬래시(`/`) 없이)를 등록합니다. 워크플로가 빌드 시 이 값을
+   `VITE_API_BASE_URL`로 주입해서 `/api/...` 상대경로 대신 그 절대 주소를 쓰도록
+   빌드합니다(`client/src/shared/api/apiBaseUrl.ts`).
+2. 서버 쪽 CORS는 이미 모든 출처를 허용하도록(`cors()` 기본값) 되어 있어 추가 설정이
+   필요 없습니다.
+
+### Google Cloud Run에 API 서버 배포하기
+
+```bash
+gcloud run deploy jp-listening-app \
+  --source . \
+  --region asia-northeast3 \
+  --allow-unauthenticated \
+  --set-env-vars GEMINI_API_KEY=발급받은_키,GEMINI_MODEL=gemini-2.5-flash
+```
+
+- `--source .`는 저장소 루트의 `Dockerfile`을 그대로 빌드합니다(Cloud Build 사용).
+- Cloud Run에서는 서비스에 **서비스 계정을 연결**해서 쓰는 걸 권장합니다(배포 시
+  `--service-account` 옵션, 또는 콘솔의 "보안" 탭). 서비스 계정에 Text-to-Speech
+  권한만 있으면 되고, 이 경우 **`GOOGLE_APPLICATION_CREDENTIALS`는 설정하지 않아도
+  됩니다** — 코드가 비어 있으면 Cloud Run이 자동으로 제공하는 자격증명(ADC)을
+  그대로 쓰도록 되어 있습니다. 로컬/Docker처럼 키 파일을 직접 쓰는 환경에서만
+  `GOOGLE_APPLICATION_CREDENTIALS`를 채워주세요.
+- 배포 후 나온 URL(`https://jp-listening-app-xxxxx.a.run.app`)을 위 1번의
+  `API_BASE_URL`에 등록하세요.
 
 ## 10. 구현 범위 안내
 
