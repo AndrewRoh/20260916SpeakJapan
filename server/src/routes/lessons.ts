@@ -33,6 +33,7 @@ export function createLessonsRouter(env: Env): Router {
           model: env.GEMINI_MODEL,
         });
       } catch (error) {
+        console.error('[lessons/generate] Gemini 호출 실패:', error);
         if (isInvalidApiKeyError(error)) {
           throw new ApiError(401, 'INVALID_API_KEY', 'Gemini API Key가 올바르지 않습니다. 설정에서 확인해주세요.');
         }
