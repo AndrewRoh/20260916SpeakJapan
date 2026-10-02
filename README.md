@@ -41,7 +41,7 @@ cp server/.env.example server/.env
 ```
 
 ```env
-GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_MODEL=gemini-2.5-flash
 GOOGLE_APPLICATION_CREDENTIALS=./gcp-service-account.json
 PORT=8787
 ```
@@ -224,7 +224,7 @@ gcloud run deploy jp-listening-app \
   --allow-unauthenticated
 ```
 
-Gemini 모델은 기본값(`gemini-3.5-flash-lite`)을 그대로 쓰면 되고, 바꾸고 싶으면
+Gemini 모델은 기본값(`gemini-2.5-flash`)을 그대로 쓰면 되고, 바꾸고 싶으면
 `--set-env-vars GEMINI_MODEL=원하는_모델명`을 추가하세요.
 
 - `--source .`는 저장소 루트의 `Dockerfile`을 그대로 빌드합니다(Cloud Build 사용).

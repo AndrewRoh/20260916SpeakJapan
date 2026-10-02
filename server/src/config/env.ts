@@ -5,7 +5,7 @@ const envSchema = z.object({
   // 서버)가 자동으로 인증을 처리한다. 로컬/Docker처럼 키 파일로 인증할 때만 채운다.
   // (TTS에서만 사용 — Gemini API Key는 더 이상 서버가 보관하지 않고 요청마다 클라이언트가 보낸다)
   GOOGLE_APPLICATION_CREDENTIALS: z.string().min(1).optional(),
-  GEMINI_MODEL: z.string().min(1).default('gemini-3.5-flash-lite'),
+  GEMINI_MODEL: z.string().min(1).default('gemini-2.5-flash'),
   PORT: z.coerce.number().int().positive().default(8787),
 });
 
