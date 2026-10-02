@@ -11,7 +11,6 @@ vi.mock('../services/googleTts.js', () => ({
 }));
 
 const testEnv = {
-  GEMINI_API_KEY: 'test-key',
   GOOGLE_APPLICATION_CREDENTIALS: './fake.json',
   GEMINI_MODEL: 'gemini-2.5-flash',
   PORT: 0,

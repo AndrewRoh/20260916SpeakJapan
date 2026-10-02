@@ -2,6 +2,7 @@ import { getUserDoc, setUserDoc } from '../../shared/firebase/firestoreSync';
 import { getCurrentUserId } from '../auth/authStore';
 import { useSettingsStore, type SettingsState } from './settingsStore';
 
+// geminiApiKey는 의도적으로 제외한다 — 비밀값이므로 Firestore로 동기화하지 않고 기기별 localStorage에만 둔다.
 type SyncableSettings = Pick<
   SettingsState,
   'speed' | 'repeatCount' | 'gapMode' | 'gapSeconds' | 'speakerAVoice' | 'speakerBVoice' | 'bookVoice'

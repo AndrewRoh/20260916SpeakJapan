@@ -26,6 +26,7 @@ export function SettingsPage() {
   const speakerAVoice = useSettingsStore((s) => s.speakerAVoice);
   const speakerBVoice = useSettingsStore((s) => s.speakerBVoice);
   const bookVoice = useSettingsStore((s) => s.bookVoice);
+  const geminiApiKey = useSettingsStore((s) => s.geminiApiKey);
   const setSpeed = useSettingsStore((s) => s.setSpeed);
   const setRepeatCount = useSettingsStore((s) => s.setRepeatCount);
   const setGapMode = useSettingsStore((s) => s.setGapMode);
@@ -33,6 +34,7 @@ export function SettingsPage() {
   const setSpeakerAVoice = useSettingsStore((s) => s.setSpeakerAVoice);
   const setSpeakerBVoice = useSettingsStore((s) => s.setSpeakerBVoice);
   const setBookVoice = useSettingsStore((s) => s.setBookVoice);
+  const setGeminiApiKey = useSettingsStore((s) => s.setGeminiApiKey);
 
   const [cacheUsage, setCacheUsage] = useState(0);
 
@@ -115,6 +117,30 @@ export function SettingsPage() {
             />
           </label>
         )}
+      </section>
+
+      <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+        <h2 className="font-semibold text-slate-800">Gemini API Key</h2>
+        <p className="text-sm text-slate-600">
+          레슨 생성에는 본인의 Gemini API Key가 필요합니다.{' '}
+          <a
+            href="https://aistudio.google.com/apikey"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            Google AI Studio
+          </a>
+          에서 무료로 발급받을 수 있습니다. 이 키는 이 기기에만 저장되며 클라우드로 동기화되지 않습니다.
+        </p>
+        <input
+          type="password"
+          autoComplete="off"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2"
+          placeholder="AIza..."
+          value={geminiApiKey}
+          onChange={(e) => setGeminiApiKey(e.target.value.trim())}
+        />
       </section>
 
       <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">

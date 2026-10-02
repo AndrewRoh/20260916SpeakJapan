@@ -25,7 +25,10 @@
 
 ### 1-2. Gemini API 키
 
-1. [Google AI Studio](https://aistudio.google.com/)에서 Gemini API 키를 발급받습니다.
+Gemini API 키는 서버가 아니라 **각 사용자가 직접** 발급받아 앱의 설정 화면에
+입력합니다(아래 "4. 사용법" 참고). [Google AI Studio](https://aistudio.google.com/apikey)에서
+무료로 발급받을 수 있습니다. 입력한 키는 브라우저 localStorage에만 저장되고 서버에는
+저장되지 않으며, 요청할 때마다 함께 전송됩니다.
 
 ## 2. 환경변수 설정
 
@@ -38,13 +41,13 @@ cp server/.env.example server/.env
 ```
 
 ```env
-GEMINI_API_KEY=발급받은_키
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 GOOGLE_APPLICATION_CREDENTIALS=./gcp-service-account.json
 PORT=8787
 ```
 
 `server`는 기동 시 이 환경변수들을 zod로 검증하며, 하나라도 없으면 실행에 실패합니다.
+(`GEMINI_MODEL`과 `GOOGLE_APPLICATION_CREDENTIALS`는 기본값/선택값이 있어 비워둬도 됩니다.)
 
 ## 3. 설치 및 실행
 
@@ -75,8 +78,9 @@ npm run build        # 클라이언트 프로덕션 빌드
 2. **책 읽기**: "책 읽기" 메뉴에서 내장 책 2편(N5/N4)을 바로 읽을 수 있고, `.txt` 파일을
    업로드해서 내 책을 추가할 수 있습니다(UTF-8/Shift_JIS 자동 판별, 2MB 이하). 업로드한
    책만 삭제할 수 있습니다.
-3. **설정**: 기본 속도/반복 횟수/간격, 화자 A·B 음성, 책 읽기 음성, 오디오 캐시 용량을
-   확인하고 전체 삭제할 수 있습니다.
+3. **설정**: Gemini API Key(레슨 생성에 필수, 기기별로 1회만 입력하면 됨), 기본 속도/
+   반복 횟수/간격, 화자 A·B 음성, 책 읽기 음성, 오디오 캐시 용량을 확인하고 전체 삭제할
+   수 있습니다.
 
 같은 문장(음성+속도+텍스트 조합)을 다시 들을 때는 IndexedDB 캐시에서 즉시 재생되며 네트워크
 호출이 발생하지 않습니다.
@@ -192,11 +196,12 @@ docker compose down
 
 ### ⚠️ 중요한 제약 — API 서버는 GitHub Pages에 올라가지 않습니다
 
-GitHub Pages(Netlify도 동일)는 **정적 파일만 서빙**합니다. `GEMINI_API_KEY`와 GCP
-서비스 계정 키를 들고 있는 `server`(Express, TTS/Gemini 프록시)는 별도로 어딘가에서
-실행되어야 합니다. 지금 배포는 **화면(client)만** 올라가므로, API 서버 주소를 정하기
-전까지는 레슨 생성·TTS 재생이 동작하지 않습니다(화면 자체, 내장 책 읽기 등 로컬
-기능은 정상 동작).
+GitHub Pages(Netlify도 동일)는 **정적 파일만 서빙**합니다. TTS용 GCP 서비스 계정
+자격증명을 쓰는 `server`(Express, TTS/Gemini 프록시)는 별도로 어딘가에서 실행되어야
+합니다. 지금 배포는 **화면(client)만** 올라가므로, API 서버 주소를 정하기 전까지는
+레슨 생성·TTS 재생이 동작하지 않습니다(화면 자체, 내장 책 읽기 등 로컬 기능은 정상
+동작). Gemini API Key는 서버가 아니라 각 사용자가 설정 화면에 직접 입력하므로
+배포 시 따로 준비할 필요는 없습니다.
 
 API 서버는 이미 만들어둔 `Dockerfile`로 Render/Fly.io/**Google Cloud Run**이나
 Synology NAS(Docker Compose) 등 Node를 실행할 수 있는 곳이면 어디든 올릴 수 있습니다.
@@ -216,9 +221,11 @@ API 서버 주소가 정해지면 아래 2단계만 해주시면 됩니다.
 gcloud run deploy jp-listening-app \
   --source . \
   --region asia-northeast3 \
-  --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=발급받은_키,GEMINI_MODEL=gemini-2.5-flash
+  --allow-unauthenticated
 ```
+
+Gemini 모델은 기본값(`gemini-3.5-flash-lite`)을 그대로 쓰면 되고, 바꾸고 싶으면
+`--set-env-vars GEMINI_MODEL=원하는_모델명`을 추가하세요.
 
 - `--source .`는 저장소 루트의 `Dockerfile`을 그대로 빌드합니다(Cloud Build 사용).
 - Cloud Run에서는 서비스에 **서비스 계정을 연결**해서 쓰는 걸 권장합니다(배포 시

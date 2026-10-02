@@ -8,7 +8,6 @@ vi.mock('../services/geminiLessonGenerator.js', () => ({
 }));
 
 const testEnv = {
-  GEMINI_API_KEY: 'test-key',
   GOOGLE_APPLICATION_CREDENTIALS: './fake.json',
   GEMINI_MODEL: 'gemini-2.5-flash',
   PORT: 0,
@@ -45,7 +44,7 @@ describe('POST /api/lessons/generate', () => {
     const app = createApp(testEnv);
     const res = await request(app)
       .post('/api/lessons/generate')
-      .send({ topic: '', level: 'N5', lineCount: 4 });
+      .send({ topic: '', level: 'N5', lineCount: 4, apiKey: 'test-key' });
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('INVALID_REQUEST');
   });
@@ -54,8 +53,17 @@ describe('POST /api/lessons/generate', () => {
     const app = createApp(testEnv);
     const res = await request(app)
       .post('/api/lessons/generate')
-      .send({ topic: '편의점', level: 'N5', lineCount: 100 });
+      .send({ topic: '편의점', level: 'N5', lineCount: 100, apiKey: 'test-key' });
     expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when apiKey is missing', async () => {
+    const app = createApp(testEnv);
+    const res = await request(app)
+      .post('/api/lessons/generate')
+      .send({ topic: '편의점', level: 'N5', lineCount: 4 });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('INVALID_REQUEST');
   });
 
   it('returns 201 with a validated lesson on success', async () => {
@@ -63,13 +71,16 @@ describe('POST /api/lessons/generate', () => {
     const app = createApp(testEnv);
     const res = await request(app)
       .post('/api/lessons/generate')
-      .send({ topic: '편의점', level: 'N5', lineCount: 4 });
+      .send({ topic: '편의점', level: 'N5', lineCount: 4, apiKey: 'test-key' });
 
     expect(res.status).toBe(201);
     expect(res.body.title).toBe('편의점에서');
     expect(res.body.lines).toHaveLength(2);
     expect(res.body.lines[0].id).toBeTruthy();
     expect(res.body.id).toBeTruthy();
+    expect(vi.mocked(generateLesson)).toHaveBeenCalledWith(
+      expect.objectContaining({ apiKey: 'test-key' }),
+    );
   });
 
   it('returns 422 when the generator keeps failing schema validation', async () => {
@@ -77,9 +88,20 @@ describe('POST /api/lessons/generate', () => {
     const app = createApp(testEnv);
     const res = await request(app)
       .post('/api/lessons/generate')
-      .send({ topic: '편의점', level: 'N5', lineCount: 4 });
+      .send({ topic: '편의점', level: 'N5', lineCount: 4, apiKey: 'test-key' });
 
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('LESSON_GENERATION_FAILED');
+  });
+
+  it('returns 401 when the API key is rejected by Gemini', async () => {
+    vi.mocked(generateLesson).mockRejectedValue(new Error('API key not valid. Please pass a valid API key.'));
+    const app = createApp(testEnv);
+    const res = await request(app)
+      .post('/api/lessons/generate')
+      .send({ topic: '편의점', level: 'N5', lineCount: 4, apiKey: 'bad-key' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe('INVALID_API_KEY');
   });
 });

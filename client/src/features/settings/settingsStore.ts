@@ -11,6 +11,7 @@ export interface SettingsState {
   speakerAVoice: string;
   speakerBVoice: string;
   bookVoice: string;
+  geminiApiKey: string;
   setSpeed: (speed: SpeedPreset) => void;
   setRepeatCount: (repeatCount: RepeatCountPreset) => void;
   setGapMode: (gapMode: GapMode) => void;
@@ -18,6 +19,7 @@ export interface SettingsState {
   setSpeakerAVoice: (voiceName: string) => void;
   setSpeakerBVoice: (voiceName: string) => void;
   setBookVoice: (voiceName: string) => void;
+  setGeminiApiKey: (apiKey: string) => void;
 }
 
 /** localStorage에는 이런 작은 UI 설정값만 저장한다(책 본문/오디오/레슨은 IndexedDB). */
@@ -36,6 +38,7 @@ export const useSettingsStore = create<SettingsState>()(
       speakerAVoice: '',
       speakerBVoice: '',
       bookVoice: '',
+      geminiApiKey: '',
       setSpeed: (speed) => set({ speed }),
       setRepeatCount: (repeatCount) => set({ repeatCount }),
       setGapMode: (gapMode) => set({ gapMode }),
@@ -43,6 +46,7 @@ export const useSettingsStore = create<SettingsState>()(
       setSpeakerAVoice: (speakerAVoice) => set({ speakerAVoice }),
       setSpeakerBVoice: (speakerBVoice) => set({ speakerBVoice }),
       setBookVoice: (bookVoice) => set({ bookVoice }),
+      setGeminiApiKey: (geminiApiKey) => set({ geminiApiKey }),
     }),
     { name: 'jp-listening-app:settings', storage: jsonStorage },
   ),

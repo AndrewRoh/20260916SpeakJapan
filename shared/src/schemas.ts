@@ -45,6 +45,7 @@ export const lessonGenerateRequestSchema = z.object({
   topic: z.string().trim().min(1).max(100),
   level: jlptLevelSchema,
   lineCount: z.number().int().min(4).max(16),
+  apiKey: z.string().trim().min(1, 'Gemini API Key가 필요합니다.'),
 });
 
 export const ttsRequestSchema = z.object({
