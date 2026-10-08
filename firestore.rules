@@ -21,6 +21,23 @@ service cloud.firestore {
       return value is string && value.size() > 0;
     }
 
+    // 콘텐츠 스튜디오 관리자 페이지(contents-admin.html) 전용 — 아래 이메일로 로그인한 사람만 읽고 쓴다.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'nohgyuwon@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // Contents Input: 정제·태깅된 내 콘텐츠 (관리자만 읽기·쓰기)
+    match /contents_input/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Contents Output: 초고·결과물 (관리자만 읽기·쓰기)
+    match /contents_output/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     match /users/{uid} {
       // 사용자 루트 문서 자체(프로필 등)는 쓰지 않지만, 혹시 쓰더라도 본인만.
       allow read, write: if isOwner(uid);
