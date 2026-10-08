@@ -3,8 +3,11 @@ import { REPEAT_COUNT_PRESETS, SPEED_PRESETS, type RepeatCountPreset, type Speed
 import type { GapMode } from '../../shared/audio/RepeatController';
 import { Button } from '../../shared/ui/Button';
 import { clearAudioCache, getAudioCacheUsageBytes } from '../../shared/tts/audioCache';
+import { useAuthStore } from '../auth/authStore';
 import { useSettingsStore } from './settingsStore';
 import { useEnsureDefaultVoices } from './useEnsureDefaultVoices';
+
+const ADMIN_PAGE_URL = `${import.meta.env.BASE_URL}contents-admin.html`;
 
 function formatBytes(bytes: number): string {
   const mb = bytes / (1024 * 1024);
@@ -16,6 +19,7 @@ function formatRepeatCount(count: RepeatCountPreset): string {
 }
 
 export function SettingsPage() {
+  const user = useAuthStore((s) => s.user);
   const { voices, loading: voicesLoading, error: voicesError } = useEnsureDefaultVoices();
   const usableVoices = voices.filter((v) => v.supportsSpeakingRate);
 
@@ -164,6 +168,18 @@ export function SettingsPage() {
           캐시 전체 삭제
         </Button>
       </section>
+
+      {user && (
+        <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="font-semibold text-slate-800">콘텐츠 창고</h2>
+          <p className="text-sm text-slate-600">
+            콘텐츠 수집·초고 관리 페이지입니다. 운영자 계정으로 다시 로그인해야 내용이 보입니다.
+          </p>
+          <a href={ADMIN_PAGE_URL} target="_blank" rel="noreferrer">
+            <Button variant="secondary">관리자 페이지 열기</Button>
+          </a>
+        </section>
+      )}
     </div>
   );
 }
